@@ -1,0 +1,9 @@
+# Local .local. files
+**/*.local.*
+
+# Backups
+*.bkp
+*.bkup
+
+# Temporary Power BI files
+pbi:memory:.ses

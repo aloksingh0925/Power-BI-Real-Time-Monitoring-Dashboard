@@ -1,0 +1,223 @@
+// https://learn.microsoft.com/en-us/rest/api/power-bi/
+// az login
+// az login --service-principal --username ${CLIENT_ID} --password ${CLIENT_SECRET} --tenant ${TENANT_ID}
+// az account get-access-token --resource https://analysis.windows.net/powerbi/api
+
+### NOTE: Adapt here!
+@token = ********
+
+###
+### Get datasets
+###
+GET https://api.powerbi.com/v1.0/myorg/datasets
+Authorization: Bearer {{token}}
+
+###
+### Create push streaming dataset in my workspace
+###
+@datasetName = Performance Counter
+@tableName = RealtimeData
+POST https://api.powerbi.com/v1.0/myorg/datasets?defaultRetentionPolicy=basicFifo HTTP/1.1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "{{datasetName}}",
+  "defaultMode": "PushStreaming",
+  "tables": [
+    {
+      "name": "{{tableName}}",
+      "columns": [
+        {
+          "name": "Id",
+          "dataType": "Int64"
+        }
+      ]
+    }
+  ]
+}
+
+###
+### Update/create table
+###
+
+### NOTE: Adapt here!
+@datasetId = ********-****-****-****-************
+
+PUT https://api.powerbi.com/v1.0/myorg/datasets/{{datasetId}}/tables/RealtimeData HTTP/1.1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "{{tableName}}",
+  "columns": [
+    {
+      "name": "Id",
+      "dataType": "Int64"
+    },
+    {
+      "name": "GroupId",
+      "dataType": "String"
+    },
+    {
+      "name": "Timestamp",
+      "dataType": "DateTime"
+    },
+    {
+      "name": "Server",
+      "dataType": "String"
+    },
+    {
+      "name": "Processor",
+      "dataType": "String"
+    },
+    {
+      "name": "Disk",
+      "dataType": "String"
+    },
+    {
+      "name": "Disk total size bytes",
+      "dataType": "Int64"
+    },
+    {
+      "name": "Ethernet",
+      "dataType": "String"
+    },
+    {
+      "name": "WLAN",
+      "dataType": "String"
+    },
+    {
+      "name": "CPU usage percent",
+      "dataType": "Double"
+    },
+    {
+      "name": "CPU 0 usage percent",
+      "dataType": "Double"
+    },
+    {
+      "name": "CPU 1 usage percent",
+      "dataType": "Double"
+    },
+    {
+      "name": "CPU 2 usage percent",
+      "dataType": "Double"
+    },
+    {
+      "name": "CPU 3 usage percent",
+      "dataType": "Double"
+    },
+    {
+      "name": "CPU max frequency percent",
+      "dataType": "Double"
+    },
+    {
+      "name": "Temperature",
+      "dataType": "Double"
+    },
+    {
+      "name": "Memory available bytes",
+      "dataType": "Int64"
+    },
+    {
+      "name": "Memory used bytes",
+      "dataType": "Int64"
+    },
+    {
+      "name": "Memory used percent",
+      "dataType": "Double"
+    },
+    {
+      "name": "Ethernet bytes received/sec",
+      "dataType": "Int64"
+    },
+    {
+      "name": "Ethernet bytes sent/sec",
+      "dataType": "Int64"
+    },
+    {
+      "name": "WLAN bytes received/sec",
+      "dataType": "Int64"
+    },
+    {
+      "name": "WLAN bytes sent/sec",
+      "dataType": "Int64"
+    },
+    {
+      "name": "Disk free bytes",
+      "dataType": "Int64"
+    },
+    {
+      "name": "Disk free space percent",
+      "dataType": "Double"
+    },
+    {
+      "name": "Disk read bytes/sec",
+      "dataType": "Double"
+    },
+    {
+      "name": "Disk write bytes/sec",
+      "dataType": "Double"
+    },
+    {
+      "name": "Processes",
+      "dataType": "Int64"
+    }
+  ]
+}
+
+###
+### Post data to dataset
+###
+POST https://api.powerbi.com/v1.0/myorg/datasets/{{datasetId}}/tables/{{tableName}}/rows
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+[
+    {
+        "Id":  133268025267401716,
+        "Timestamp":  "2023-04-24T09:35:26.740Z",
+        "Server":  "BGPF13S59E",
+        "Processor":  "Intel(R) Core(TM) i7-7820HQ CPU @ 2.90GHz",
+        "Disk":  "SAMSUNG MZVLB512HAJQ-000L7",
+        "Disk total size bytes":  512110190592,
+        "Ethernet":  "Intel(R) Ethernet Connection (5) I219-LM",
+        "WLAN":  "Intel(R) Dual Band Wireless-AC 8265",
+        "CPU usage percent":  12.64,
+        "CPU 0 usage percent":  16.51,
+        "CPU 1 usage percent":  11.1,
+        "CPU 2 usage percent":  13.42,
+        "CPU 3 usage percent":  5.69,
+        "CPU max frequency percent":  100,
+        "Temperature":  71.85,
+        "Memory available bytes":  17789517824,
+        "Memory used bytes":  18920972288,
+        "Memory used percent":  48.11,
+        "Ethernet bytes received/sec":  0,
+        "Ethernet bytes sent/sec":  0,
+        "WLAN bytes received/sec":  117548,
+        "WLAN bytes sent/sec":  102017,
+        "Disk free bytes":  256499515392,
+        "Disk read bytes/sec":  0,
+        "Disk write bytes/sec":  240653.11,
+        "Processes":  317
+    }
+]
+
+###
+### Delete rows in dataset
+###
+DELETE https://api.powerbi.com/v1.0/myorg/datasets/{{datasetId}}/tables/{{tableName}}/rows
+Authorization: Bearer {{token}}
+
+###
+### Create Power BI dashboard
+###
+@dashboardName = Performance Counter
+POST https://api.powerbi.com/v1.0/myorg/dashboards
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "{{dashboardName}}"
+}
